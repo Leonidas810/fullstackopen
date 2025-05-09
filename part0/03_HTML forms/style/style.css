@@ -1,0 +1,46 @@
+body{
+    background-color: rgb(25, 83, 121);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container{
+    padding: 20px;
+    text-align: center;
+    border: .2rem solid black;
+    background-color: rgb(64, 124, 170);
+}
+
+h1{
+    text-shadow: 3px 3px 1px black;
+}
+
+
+form{
+    display: flex;
+    flex-direction: column;
+}
+
+textarea{
+    height: 150px;
+    resize: none;
+}
+
+button{
+    margin-top: 1rem;
+    border-radius: 8px;
+    background-color:rgb(25, 83, 121);
+    color: white;
+    font-weight: bold;
+    border: 0px;
+    height: 30px;
+    cursor: pointer;
+    transition:all 0.5s ease-in-out;
+}
+
+button:hover{
+    scale: 102%;
+}

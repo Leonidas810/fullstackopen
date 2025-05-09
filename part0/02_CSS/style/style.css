@@ -1,0 +1,23 @@
+body{
+    background-color: rgb(25, 83, 121);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container{
+    text-align: center;
+    border: .2rem solid black;
+    background-color: rgb(64, 124, 170);
+}
+
+h1,h2{
+    text-shadow: 3px 3px 1px black;
+}
+
+img{
+    border-radius: 100%;
+    width: 50%;
+}
