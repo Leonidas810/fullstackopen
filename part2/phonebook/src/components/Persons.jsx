@@ -1,4 +1,4 @@
-const Persons = ({ personsFilter, persons }) => {
+const Persons = ({ personsFilter, persons, handleDeletePerson }) => {
     return (
         <ol>
             {
@@ -6,11 +6,13 @@ const Persons = ({ personsFilter, persons }) => {
                     ? persons.map((e) =>
                         <li key={e.id}>
                             <span>{e?.name ?? "S/N"}</span> - <span>{e?.number ?? "S/N"}</span>
+                            <button onClick={()=>handleDeletePerson(e)}>Delete</button>
                         </li>
                     )
                     : personsFilter.persons.map((e) =>
                         <li key={e.id}>
                             <span>{e?.name ?? "S/N"}</span> - <span>{e?.number ?? "S/N"}</span>
+                            <button onClick={()=>handleDeletePerson(e)}>Delete</button>
                         </li>
                     )
             }
