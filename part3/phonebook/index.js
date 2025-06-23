@@ -33,36 +33,47 @@ app.get('/api/persons/:id', (request, response) => {
   const id = request.params.id;
   const indexPerson = persons.findIndex((p) => p.id === id)
   if (indexPerson === -1) {
-    response.status(204).end();
-  } else {
-    response.send(persons[indexPerson]);
-  }
+    return response.status(204).end();
+  };
+
+  response.send(persons[indexPerson]);
+
 })
 
 app.delete('/api/persons/:id', (request, response) => {
   const id = request.params.id;
   const indexPerson = persons.findIndex((p) => p.id === id);
   if (indexPerson === -1) {
-    response.status(204);
-  } else {
-    const newPersons = [...persons.slice(0, indexPerson), ...persons.slice(indexPerson + 1, persons.length)];
-    persons = newPersons;
-    response.status(200).send(`User ${id} deletion done successfully`);
-  }
+    return response.status(204).end();
+  };
+
+  const newPersons = [...persons.slice(0, indexPerson), ...persons.slice(indexPerson + 1, persons.length)];
+  persons = newPersons;
+  response.status(200).send(`User ${id} deletion done successfully`);
+
 })
 
 app.post('/api/persons', (request, response) => {
-  const id = persons.length+1;
-  const person = { id: id.toString(), ...request.body };
-  response.send(person);
+  const data = request.body;
+  if (!data.name || !data.number) {
+    return response.status(400).send('Name and number are required');
+  }
+
+  if (persons.some((e) => e.number === data.number)) {
+    return response.status(400).send(`This phone number ${data.number} is already taken`);
+  }
+
+  const id = (persons.length + 1).toString();
+  const person = { id, ...data }; persons.push(person);
+  response.status(201).send(person);
 })
 
 app.get('/info', (request, response) => {
   const date = new Date();
-  response.send(`
-    <p>Phonebook has info for ${persons.length} people</p>
-    <p>${date}</p>
-    `)
+  response.send(
+    `<p>Phonebook has info for ${persons.length} people</p>
+    <p>${date}</p>`
+  )
 })
 
 const PORT = 3001;
