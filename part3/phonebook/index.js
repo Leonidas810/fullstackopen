@@ -59,8 +59,8 @@ app.post('/api/persons', (request, response) => {
     return response.status(400).send('Name and number are required');
   }
 
-  if (persons.some((e) => e.number === data.number)) {
-    return response.status(400).send(`This phone number ${data.number} is already taken`);
+  if (persons.some((e) => e.name === data.name)) {
+    return response.status(400).send(`This name ${data.name} is already taken`);
   }
 
   const id = (persons.length + 1).toString();
