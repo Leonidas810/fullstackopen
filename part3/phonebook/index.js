@@ -1,6 +1,10 @@
 const express = require("express");
+const morgan = require("morgan");
 const app = express();
-app.use(express.json());
+app.use(express.json(), morgan('tiny', {
+  skip: function (req, res) { return res.statusCode < 400 }
+}));
+
 
 let persons = [
   {
@@ -35,9 +39,7 @@ app.get('/api/persons/:id', (request, response) => {
   if (indexPerson === -1) {
     return response.status(204).end();
   };
-
   response.send(persons[indexPerson]);
-
 })
 
 app.delete('/api/persons/:id', (request, response) => {
