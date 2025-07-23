@@ -1,4 +1,5 @@
-const { createPerson, getAllPersons, deletePerson, getOnePerson } = require('./controllers/personController')
+const { createPerson, getAllPersons, deletePerson, getOnePerson, updatePerson, countPerson } = require('./controllers/personController')
+const errorHandler = require('./middleware/errorHandler')
 
 require('dotenv').config();
 const express = require("express");
@@ -18,60 +19,65 @@ mongoose.connect(process.env.MONGOURL)
   .then(() => console.log("Connected"))
   .catch((err) => console.log(`Error: ${err}`))
 
-app.get("/api/persons", async (_, res) => {
+app.get('/info', async (_, res, next) => {
+  try {
+    const date = new Date();
+    const count = await countPerson();
+    res.json({ numberOfPersons: count, date: date })
+  } catch (err) {
+    return next(err)
+  }
+})
+
+app.get("/api/persons", async (_, res, next) => {
   try {
     const persons = await getAllPersons();
     res.json(persons);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Internal Server Error" });
+    return next(err);
   }
 });
 
-app.get('/api/persons/:id', async (req, res) => {
+app.post('/api/persons', async (req, res, next) => {
   try {
-    const id = req.params.id;
-    const person = await getOnePerson(id);
-    if (!person) res.status(404).end();
-    res.json(person);
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-})
-
-app.delete('/api/persons/:id', async (req, res) => {
-  try {
-    const id = req.params.id;
-    const deletedPerson = await deletePerson(id);
-    if (!deletedPerson) res.status(404).end();
-    res.json({ message: `User ${deletedPerson.name} deletion done successfully` });
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-})
-
-app.post('/api/persons', async (req, res) => {
-  try {
-    const data = req.body;
-    if (!data.name || !data.number) throw Error("Name and number are required")
-    const person = { name: data.name, number: data.number };
+    const { name, number } = req.body;
+    if (!name || !number) throw Error("Name and number are required")
+    const person = { name, number };
     const savedPerson = await createPerson(person);
     res.json(savedPerson);
   } catch (err) {
-    console.log(err);
-    res.status(500).json({ error: "Internal Server Error" });
+    return next(err);
   }
 })
 
-app.get('/info', (_, res) => {
-  const date = new Date();
-  res.send(
-    `<p>Phonebook has info for ${persons.length} people</p>
-    <p>${date}</p>`
-  )
+app.get('/api/persons/:id', async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const person = await getOnePerson(id);
+    if (!person) throw Error("The person does not exist");
+    res.json(person);
+  } catch (err) {
+    return next(err);
+  }
 })
+
+app.delete('/api/persons/:id', async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const deletedPerson = await deletePerson(id);
+    if (!deletedPerson) throw Error("The person does not exist")
+    res.json({ message: `User ${deletedPerson.name} deletion done successfully` });
+  } catch (err) {
+    return next(err);
+  }
+})
+
+// Unknown endpoint
+app.use((_, res) => {
+  res.status(404).json({ error: 'Unknown endpoint' });
+});
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001
 

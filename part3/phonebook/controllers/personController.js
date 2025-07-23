@@ -13,6 +13,15 @@ const createPerson = async (newPerson) => {
     }
 };
 
+const countPerson = async () =>{
+    try{
+        const count = await PersonModel.countDocuments();
+        return count;
+    }catch(err){
+        throw err;
+    }
+}
+
 
 const getOnePerson = async (id) => {
     try {
@@ -34,7 +43,17 @@ const getAllPersons = async () => {
 
 const deletePerson = async (id) => {
     try {
-        const person = await PersonModel.findByIdAndDelete(id); 
+        const person = await PersonModel.findByIdAndDelete(id);
+        return person;
+    } catch (err) {
+        throw err;
+    }
+}
+
+const updatePerson = async (updatePerson) => {
+    try {
+        const { id } = updatePerson;
+        const person = await PersonModel.findByIdAndUpdate(id, updatePerson);
         return person;
     } catch (err) {
         throw err;
@@ -47,4 +66,6 @@ module.exports = {
     getAllPersons,
     deletePerson,
     getOnePerson,
+    updatePerson,
+    countPerson
 };
