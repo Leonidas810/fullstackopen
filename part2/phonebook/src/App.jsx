@@ -57,17 +57,16 @@ const App = () => {
         });
         return;
       }
-      const newPerson = {
+      const dataPerson = {
         name: newName.name,
         number: newName.number,
-        id: (persons.length + 1).toString()
       };
-      await personService.create(newPerson);
+      const savedPerson = await personService.create(dataPerson);
       setNotify({
         type: 'success',
-        msg: `${newName.name} is added to phonebook`
+        msg: `${savedPerson.name} is added to phonebook`
       })
-      const updatedPersons = [...persons, newPerson];
+      const updatedPersons = [...persons, savedPerson];
       setPersons(updatedPersons);
       setPersonsFilter({
         filter: "",
