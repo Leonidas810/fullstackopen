@@ -66,7 +66,19 @@ app.delete('/api/persons/:id', async (req, res, next) => {
     const id = req.params.id;
     const deletedPerson = await deletePerson(id);
     if (!deletedPerson) throw Error("The person does not exist")
-    res.json({ message: `User ${deletedPerson.name} deletion done successfully` });
+    res.json(deletedPerson);
+  } catch (err) {
+    return next(err);
+  }
+})
+
+app.put('/api/persons', async (req, res, next) => {
+  try {
+    const { id, name, number } = req.body;
+    if(!id) throw Error ("Id is requerided");
+    const personData = { name, number };
+    const updatedPerson = await updatePerson(id, personData);
+    res.json(updatedPerson);
   } catch (err) {
     return next(err);
   }

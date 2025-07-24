@@ -14,7 +14,7 @@ const App = () => {
     persons: persons
   });
 
-  const [newName, setNewName] = useState({
+  const [newPerson, setNewPerson] = useState({
     name: "",
     number: ""
   })
@@ -27,65 +27,46 @@ const App = () => {
   }, []);
 
   const handleDeletePerson = async (person) => {
-    const { id, name } = person;
     try {
-      await personService.deletePerson(id);
-      const updatedPersons = persons.filter((e)=>e.id!==id);
-      setPersons(updatedPersons)
-      setNotify({
-        type: 'success',
-        msg: `${name} is delete from phonebook`
-      })
+      const deletePerson = await personService.deletePerson(person.id);
+      setPersons(persons.filter((e) => e.id !== deletePerson.id));
+      setNotify({ type: 'success', msg: `${deletePerson.name} is delete from phonebook` })
     } catch (err) {
-      console.log(err)
-      setNotify({
-        type: 'fail',
-        msg: `Information of ${name} has alredy been removed from server`
-      })
+      console.log(err);
+      const message = err?.response?.data?.error || "Error "
+      setNotify({ type: 'fail', msg: message });
     }
   }
 
+  const handleUpdatePerson = async (id) => {
+    const updatedPerson = await personService.updatePerson({ id, ...newPerson });
+    setPersons(persons.map((e) => e.id === id ? updatedPerson : e));
+    setNotify({ type: 'fail', msg: `${newPerson.name} is already added to phonebook` });
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const nameExists = persons.some((p) => p.name === newName.name);
-      if (nameExists) {
-        setNotify({
-          type: 'fail',
-          msg: `${newName.name} is already added to phonebook`
-        });
+      const personExist = persons.find((p) => p.name === newPerson.name);
+      if (personExist) {
+        handleUpdatePerson(personExist.id);
         return;
       }
-      const dataPerson = {
-        name: newName.name,
-        number: newName.number,
-      };
-      const savedPerson = await personService.create(dataPerson);
-      setNotify({
-        type: 'success',
-        msg: `${savedPerson.name} is added to phonebook`
-      })
-      const updatedPersons = [...persons, savedPerson];
-      setPersons(updatedPersons);
-      setPersonsFilter({
-        filter: "",
-        persons: updatedPersons
-      });
+      const savedPerson = await personService.create(newPerson);
+      setPersons([...persons, savedPerson]);
+      setPersonsFilter({ filter: "", persons: [...persons, savedPerson] });
+      setNotify({ type: 'success', msg: `${savedPerson.name} is added to phonebook` });
     } catch (err) {
-      console.log(err)
-      setNotify({
-        type: 'fail',
-        msg: `${newName.name} is already added to phonebook`
-      });
+      console.log(err);
+      const message = err?.response?.data?.error || "Error "
+      setNotify({ type: 'fail', msg: message });
     }
-
   }
 
   const handleOnChangeInput = (e) => {
     e.preventDefault();
     const inputType = e.target.dataset.input;
-    setNewName((prevState) => {
+    setNewPerson((prevState) => {
       return inputType === "name"
         ? { ...prevState, name: e.target.value }
         : { ...prevState, number: e.target.value }
@@ -104,7 +85,7 @@ const App = () => {
       {notify && <Notify {...notify} />}
       <Filter onChange={handleOnChangeFilter} value={personsFilter.filter} />
       <h2>Add a new</h2>
-      <PersonForm handleSubmit={handleSubmit} onChange={handleOnChangeInput} valueName={newName.name} valueNumber={newName.number} />
+      <PersonForm handleSubmit={handleSubmit} onChange={handleOnChangeInput} valueName={newPerson.name} valueNumber={newPerson.number} />
       <h2>Numbers</h2>
       <Persons handleDeletePerson={handleDeletePerson} personsFilter={personsFilter} persons={persons} />
 

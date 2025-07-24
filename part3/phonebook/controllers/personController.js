@@ -6,18 +6,15 @@ const createPerson = async (newPerson) => {
         const savedPerson = await person.save();
         return savedPerson;
     } catch (err) {
-        if (err.code === 11000) {
-            throw new Error('Name must be unique');
-        }
         throw err;
     }
 };
 
-const countPerson = async () =>{
-    try{
+const countPerson = async () => {
+    try {
         const count = await PersonModel.countDocuments();
         return count;
-    }catch(err){
+    } catch (err) {
         throw err;
     }
 }
@@ -50,10 +47,9 @@ const deletePerson = async (id) => {
     }
 }
 
-const updatePerson = async (updatePerson) => {
+const updatePerson = async (id, updatePerson) => {
     try {
-        const { id } = updatePerson;
-        const person = await PersonModel.findByIdAndUpdate(id, updatePerson);
+        const person = await PersonModel.findByIdAndUpdate(id, updatePerson, { new: true, runValidators: true });
         return person;
     } catch (err) {
         throw err;
